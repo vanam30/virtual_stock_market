@@ -151,7 +151,7 @@ def get_market_price(request):
     global MARKET_PRICE
     global PREVIOUS_PRICE
 
-    ################################# -> TESTING PURPOSE
+    # -> TESTING PURPOSE
     MARKET_PRICE += 1
     PREVIOUS_PRICE.append(MARKET_PRICE)
     #################################
