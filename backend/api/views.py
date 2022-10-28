@@ -150,8 +150,12 @@ def add_new_order(request):
 def get_market_price(request):
     global MARKET_PRICE
     global PREVIOUS_PRICE
+
+    ################################# -> TESTING PURPOSE
     MARKET_PRICE += 1
     PREVIOUS_PRICE.append(MARKET_PRICE)
+    #################################
+
     return Response({'market_price': MARKET_PRICE})
 
 
