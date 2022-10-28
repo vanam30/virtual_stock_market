@@ -13,7 +13,7 @@ class Pending_Buy_Order(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
     added = models.DateField(auto_now_add=True)
-    owner = models.OneToOneField(Person,related_name='pending_buy_order',on_delete=models.CASCADE)
+    owner = models.ForeignKey(Person,on_delete=models.CASCADE)
 
     def __str__(self):
         return str(self.added)
