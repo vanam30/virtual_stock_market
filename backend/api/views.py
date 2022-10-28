@@ -1,9 +1,11 @@
 from rest_framework.response import Response
-from myUser.models import Person, Pending_Buy_Order, Pending_Sell_Order
-from .serializers import PersonSerializers, BuyOrderSerializer, SellOrderSerializer
+from myUser.models import Person, Pending_Buy_Order, Pending_Sell_Order, Transaction
+from .serializers import PersonSerializers, BuyOrderSerializer, SellOrderSerializer, TransactionSerializer
 from rest_framework.decorators import api_view
 
 MARKET_PRICE = 100
+PREVIOUS_PRICE = [MARKET_PRICE]
+
 
 @api_view(['GET'])
 def get_routes(request):
@@ -33,6 +35,16 @@ def get_routes(request):
             'desc': 'Sends Pending buys',
             'method': 'GET'
         },
+        {
+            'url': 'http://127.0.0.1:8000/transaction',
+            'desc': 'Sends Transaction History',
+            'method': 'GET'
+        },
+        {
+            'url': 'http://127.0.0.1:8000/graph',
+            'desc': 'Sends Y-Coordinates of Graph',
+            'method': 'GET'
+        },
     ]
     return Response(routes)
 
@@ -55,6 +67,13 @@ def get_pending_sell(request):
     pendind_sells = SellOrderSerializer(
         Pending_Sell_Order.objects.all(), many=True)
     return Response(pendind_sells.data)
+
+
+@api_view(['GET'])
+def get_transactions(request):
+    transactions = TransactionSerializer(
+        Transaction.objects.all(), many=True)
+    return Response(transactions.data)
 
 
 @api_view(['GET', 'POST'])
@@ -116,19 +135,26 @@ def add_new_order(request):
                 Pending_Sell_Order(quantity=stock_amount,
                                    price=price, owner=user).save()
 
-            buy_serializer = BuyOrderSerializer(
-                Pending_Buy_Order.objects.all(), many=True)
-            return Response(buy_serializer.data)
+            return Response({"success": "ok"})
         else:
             # TODO : Apply market rules
 
+            if buy_or_sell == 'buy':
+                pass
+            else:
+                pass
             return Response({"success": "market order"})
-
-
 
 
 @api_view(['GET'])
 def get_market_price(request):
     global MARKET_PRICE
-    # MARKET_PRICE += 1
+    global PREVIOUS_PRICE
+    MARKET_PRICE += 1
+    PREVIOUS_PRICE.append(MARKET_PRICE)
     return Response({'market_price': MARKET_PRICE})
+
+
+@api_view(['GET'])
+def get_graph(request):
+    return Response(PREVIOUS_PRICE)

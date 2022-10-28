@@ -8,4 +8,6 @@ urlpatterns = [
     path('price',views.get_market_price,name='market-price'),
     path('sell',views.get_pending_sell,name='sell'),
     path('buy',views.get_pending_buy,name='buy'),
+    path('transaction',views.get_transactions,name='transaction'),
+    path('graph',views.get_graph,name='graph'),
 ]
