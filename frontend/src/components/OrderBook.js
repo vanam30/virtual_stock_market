@@ -47,7 +47,7 @@ function OrderBook(){
     });
     return(
         <div className='row'>
-            <div className='col-4 card card-body'>
+            <div className='col-4 card1 card-body'>
                 <h5 class="card-title">Buy</h5>
                 <table className="table">
                     <thead>
@@ -65,7 +65,7 @@ function OrderBook(){
                     </tbody>
                 </table>
             </div>
-            <div className='col-4 card card-body'>
+            <div className='col-4 card1 card-body'>
                 <h5 class="card-title">Sell</h5>
                 <table className="table">
                     <thead>

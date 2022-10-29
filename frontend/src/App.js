@@ -47,7 +47,6 @@ function App() {
             <Transaction />
           </div>
         </div>
-      <Actions />
     </>
   );
 }

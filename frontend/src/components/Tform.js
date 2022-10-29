@@ -92,7 +92,7 @@ function Tform(){
                         })
                     }
                 </select><br />
-                <select onChange={changeType} name="orderType" id = "orderType" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                <select style={{ marginBottom: "1.5em",  }} onChange={changeType} name="orderType" id = "orderType" class="form-select form-select-sm" aria-label=".form-select-sm example">
                     <option value="limit">Limit</option>
                     <option value="market">Market</option>
                 </select>
