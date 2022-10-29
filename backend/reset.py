@@ -1,5 +1,7 @@
-from myUser.models import Person, Pending_Sell_Order, Pending_Buy_Order, Transaction, MarketPrice
+# python manage.py shell
 
+
+from myUser.models import Person, Pending_Sell_Order, Pending_Buy_Order, Transaction, MarketPrice
 def ok():
     Person.objects.filter(name='A').update(stocks=10, fiat=5000)
     Person.objects.filter(name='B').update(stocks=20, fiat=3000)

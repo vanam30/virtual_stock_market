@@ -9,37 +9,37 @@ def get_routes(request):
     routes = [
         {
             'url': 'http://127.0.0.1:8000/order',
-            'desc': 'GET : Requirements for Post method. POST : Add new order in market',
+            'payload': 'GET : Requirements for Post method. POST : Add new order in market',
             'method': '{GET,POST}'
         },
         {
             'url': 'http://127.0.0.1:8000/user',
-            'desc': 'User Portfolio',
+            'payload': 'User Portfolio',
             'method': 'GET'
         },
         {
             'url': 'http://127.0.0.1:8000/price',
-            'desc': 'Sends Current Market Price as JSON file',
+            'payload': 'Sends Current Market Price as JSON file',
             'method': 'GET'
         },
         {
             'url': 'http://127.0.0.1:8000/sell',
-            'desc': 'Sends Pending sells',
+            'payload': 'Sends Pending sells',
             'method': 'GET'
         },
         {
             'url': 'http://127.0.0.1:8000/buy',
-            'desc': 'Sends Pending buys',
+            'payload': 'Sends Pending buys',
             'method': 'GET'
         },
         {
             'url': 'http://127.0.0.1:8000/transaction',
-            'desc': 'Sends Transaction History',
+            'payload': 'Sends Transaction History',
             'method': 'GET'
         },
         {
             'url': 'http://127.0.0.1:8000/graph',
-            'desc': 'Sends Y-Coordinates of Graph',
+            'payload': 'Sends Y-Coordinates of Graph',
             'method': 'GET'
         },
     ]
@@ -141,7 +141,7 @@ def add_new_order(request):
                         user_selled[seller.owner] += stock_amount
                         content.append({
                             "action": "remove_pending_sell",
-                            "desc": {
+                            "payload": {
                                 "id": seller.id,
                             }
                         })
@@ -155,7 +155,7 @@ def add_new_order(request):
                         user_selled[seller.owner] += stock_amount
                         content.append({
                             "action": "update_pending_sell",
-                            "desc": {
+                            "payload": {
                                 "id": seller.id,
                                 "quantity": seller.quantity - stock_amount
                             }
@@ -170,7 +170,7 @@ def add_new_order(request):
                         user_selled[seller.owner] += seller.quantity
                         content.append({
                             "action": "remove_pending_sell",
-                            "desc": {
+                            "payload": {
                                 "id": seller.id,
                             }
                         })
@@ -185,7 +185,7 @@ def add_new_order(request):
                     trans.save()
                     content.append({
                         "action": "add_transaction",
-                        "desc": {
+                        "payload": {
                             "id": trans.id,
                             "seller": trans.seller,
                             "buyer": trans.buyer,
@@ -198,7 +198,7 @@ def add_new_order(request):
                         MarketPrice(price=trans.price).save()
                         content.append({
                             "action": "change_market_price",
-                            "desc": {
+                            "payload": {
                                 "market_price" : trans.price
                             }
                         })
@@ -212,7 +212,7 @@ def add_new_order(request):
                         stocks=new_stocks, fiat=new_fiat)
                     content.append({
                         "action": "update_user",
-                        "desc": {
+                        "payload": {
                             "name": trans.seller,
                             "stocks": new_stocks,
                             "fiat": new_fiat
@@ -228,7 +228,7 @@ def add_new_order(request):
                         stocks=new_stocks, fiat=new_fiat)
                     content.append({
                         "action": "update_user",
-                        "desc": {
+                        "payload": {
                             "name": person.name,
                             "stocks": new_stocks,
                             "fiat": new_fiat
@@ -248,7 +248,7 @@ def add_new_order(request):
                     pending_buy.save()
                     content.append({
                         "action": "add_pending_buy",
-                        "desc": {
+                        "payload": {
                             "id": pending_buy.id,
                             "user": pending_buy.owner,
                             "quantity": pending_buy.quantity,
@@ -266,7 +266,7 @@ def add_new_order(request):
 
                     content.append({
                         "action": "add_pending_sell",
-                        "desc": {
+                        "payload": {
                             "id": pending_sell.id,
                             "user": pending_sell.owner,
                             "quantity": pending_sell.quantity,
