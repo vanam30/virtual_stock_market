@@ -1,4 +1,4 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, DateTimeField,Serializer,FloatField
 from myUser.models import MarketPrice, Person, Pending_Sell_Order, Pending_Buy_Order, Transaction
 
 
@@ -21,12 +21,12 @@ class SellOrderSerializer(ModelSerializer):
 
 
 class TransactionSerializer(ModelSerializer):
+    date = DateTimeField()
     class Meta:
         model = Transaction
         fields = '__all__'
 
 
-class MarketPriceSerializer(ModelSerializer):
-    class Meta:
-        model = MarketPrice
-        fields = '__all__'
+class MarketPriceSerializer(Serializer):
+    date = DateTimeField()
+    price = FloatField()

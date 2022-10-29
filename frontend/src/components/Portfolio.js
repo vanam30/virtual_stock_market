@@ -2,14 +2,14 @@ import React, { useEffect } from "react";
 import store from "../store";
 import Userrow from "./Userrow";
 
-function fetch_data(){
+function fetch_data(url){
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "http://127.0.0.1:8000/user", true);
+    xhttp.open("GET", "http://127.0.0.1:8000/"+url, true);
     xhttp.send();
     return xhttp;
 }
 
-var xhttp = fetch_data();
+var xhttp = fetch_data("all");
 
 
 function Portfolio() {
@@ -19,12 +19,8 @@ function Portfolio() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             // Typical action to be performed when the document is ready:
-            console.log(JSON.parse(xhttp.responseText));
             let data = JSON.parse(xhttp.responseText);
-            console.group(store);
-            for(let i=0; i<data.length; i++){
-                store.dispatch({type: "userAdded", payload: data[i]});
-            }
+            store.dispatch({type: "userAdded", payload: data.payload});
         }
     };
 
@@ -43,7 +39,6 @@ function Portfolio() {
         <tbody>
             {
                 users.map((user) => {
-                    console.log(users.length);
                     return <Userrow key={user.id} name={user.name} stocks={user.stocks} fiat={user.fiat} />
                 })
             }

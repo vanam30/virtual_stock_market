@@ -10,4 +10,5 @@ urlpatterns = [
     path('buy',views.get_pending_buy,name='buy'),
     path('transaction',views.get_transactions,name='transaction'),
     path('graph',views.get_graph,name='graph'),
+    path('all',views.get_all,name='all'),
 ]

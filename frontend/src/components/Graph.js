@@ -1,35 +1,59 @@
 import React, { useState } from 'react';
-import Plot from 'react-plotly.js';
 import store from "../store";
 
+import { Line } from "react-chartjs-2";
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { Chart } from 'react-chartjs-2'
+ChartJS.register(...registerables);
+
 function Graph(){
-    console.log(store);
-    function fetch_data(){
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                // Typical action to be performed when the document is ready:
-                console.log(xhttp.responseText);
-            }
-        };
-        xhttp.open("GET", "http://127.0.0.1:8000/", true);
-        xhttp.send();
-    }
-    const [plot_data, update_data] = useState([
+    
+    const [data,setData] = useState({
+      labels: store.getState().marketPrices.map((item,idx) => item.date),
+      datasets: [
         {
-            x: [1, 2, 3],
-            y: [2, 6, 3],
-            type: 'scatter',
-            mode: 'lines+points',
-            marker: {color: 'red'},
+          label: "Plot",
+          backgroundColor: "rgb(255, 99, 132)",
+          borderColor: "rgb(255, 99, 132)",
+          data: store.getState().marketPrices.map((item,idx) => item.price),
         },
-    ]);
+      ],
+    });
+    
+    // const [plot_data, update_data] = useState([
+    //     {
+    //         x: store.getState().marketPrices.map((u_data,idx) =>  idx),
+    //         y: store.getState().marketPrices.map((u_data) => u_data.price),
+    //         type: 'scatter',
+    //         mode: 'lines+markers',
+    //         marker: {color: 'red'},
+    //     },
+    // ]);
+    store.subscribe(()=>{
+        console.log("Graph.js: store.subscribe() called", store.getState().marketPrices);
+        // update_data([{
+        //     x: store.getState().marketPrices.map((u_data,idx) => idx),
+        //     y: store.getState().marketPrices.map((u_data) => u_data.price),
+        //     type: 'scatter',
+        //     mode: 'lines+markers',
+        //     marker: {color: 'red'},
+        // }]);
+        setData({
+            labels:store.getState().marketPrices.map((item,idx) => item.date),
+            datasets: [
+              {
+                label: "Plot",
+                backgroundColor: "rgb(255, 99, 132)",
+                borderColor: "rgb(255, 99, 132)",
+                data: store.getState().marketPrices.map((item,idx) => item.price),
+              },
+            ],
+          });
+    });
     return (
-        <Plot
-            data={plot_data}
-            layout={{width: 320, height: 320, title: 'A Fancy Plot'}}
-        />
+        <Line data={data} />
     );
 }
+
 
 export default Graph;

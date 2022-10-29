@@ -5,6 +5,7 @@ let newstate={};
 
 function reducer(state={users:[],actions: [],buyPending: [], sellPending:[], transaction: [], marketPrices: []}, action) {
 newstate.actions = [...state.actions, action];
+console.log({action});
   switch (action.type) {
     case "change_market_price":
         newstate.users = [...state.users];
@@ -14,11 +15,11 @@ newstate.actions = [...state.actions, action];
         newstate.sellPending = [...state.sellPending];
         return newstate;
     case "userAdded":
-        newstate.marketPrices = [...state.marketPrices];
-        newstate.users = [...state.users, {id: action.payload.id, name: action.payload.name, stocks: action.payload.stocks, fiat: action.payload.fiat}];
-        newstate.transaction = [...state.transaction];
-        newstate.buyPending = [...state.buyPending];
-        newstate.sellPending = [...state.sellPending];
+        newstate.marketPrices = [...state.marketPrices, ...action.payload.market_price];
+        newstate.users = [...state.users, ...action.payload.users];
+        newstate.transaction = [...state.transaction, ...action.payload.transactions];
+        newstate.buyPending = [...state.buyPending, ...action.payload.pending_buy];
+        newstate.sellPending = [...state.sellPending,...action.payload.pending_sell];
         return newstate;
     case 'add_pending_buy':
         newstate.marketPrices = [...state.marketPrices];

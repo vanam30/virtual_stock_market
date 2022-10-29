@@ -80,7 +80,6 @@ function Tform(){
 
     return(
         <div>
-            <h3>T form</h3>
             <form onSubmit={handleSubmit}>
                 <select name="buyORsell" id = "buyOsell" class="form-select form-select-sm" aria-label=".form-select-sm example">
                     <option value="buy">Buy</option>

@@ -11,3 +11,37 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.navbar {
+  background-color: #4d648d !important;
+
+}
+
+.nav-item a {
+  color: white !important;
+  text-decoration: none;
+}
+
+.nav-item a:hover {
+  color: #4d648d !important;
+}
+
+.navbar-brand img {
+  height: 40px;
+}
+
+.d-flex {
+  color: white !important;
+  font-size: 150%;
+  margin-right: 1.4vw;
+}
+
+.first-row-upper {
+  display: flex;
+  margin: 2vw;
+}
+
+.graph-stock {
+  width: 60%;
+  padding: 20px;
+}
