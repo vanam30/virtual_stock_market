@@ -140,7 +140,7 @@ def add_new_order(request):
                             user_selled[seller.owner] = 0
                         user_selled[seller.owner] += stock_amount
                         content.append({
-                            "action": "remove_pending_sell",
+                            "type": "remove_pending_sell",
                             "payload": {
                                 "id": seller.id,
                             }
@@ -154,7 +154,7 @@ def add_new_order(request):
                             user_selled[seller.owner] = 0
                         user_selled[seller.owner] += stock_amount
                         content.append({
-                            "action": "update_pending_sell",
+                            "type": "update_pending_sell",
                             "payload": {
                                 "id": seller.id,
                                 "quantity": seller.quantity - stock_amount
@@ -169,7 +169,7 @@ def add_new_order(request):
                             user_selled[seller.owner] = 0
                         user_selled[seller.owner] += seller.quantity
                         content.append({
-                            "action": "remove_pending_sell",
+                            "type": "remove_pending_sell",
                             "payload": {
                                 "id": seller.id,
                             }
@@ -184,7 +184,7 @@ def add_new_order(request):
                         user), quantity=user_selled[key], price=price)
                     trans.save()
                     content.append({
-                        "action": "add_transaction",
+                        "type": "add_transaction",
                         "payload": {
                             "id": trans.id,
                             "seller": trans.seller,
@@ -197,9 +197,9 @@ def add_new_order(request):
                     if once == 1:
                         MarketPrice(price=trans.price).save()
                         content.append({
-                            "action": "change_market_price",
+                            "type": "change_market_price",
                             "payload": {
-                                "market_price" : trans.price
+                                "market_price": trans.price
                             }
                         })
                         once = 0
@@ -211,7 +211,7 @@ def add_new_order(request):
                     Person.objects.filter(name=trans.seller).update(
                         stocks=new_stocks, fiat=new_fiat)
                     content.append({
-                        "action": "update_user",
+                        "type": "update_user",
                         "payload": {
                             "name": trans.seller,
                             "stocks": new_stocks,
@@ -227,7 +227,7 @@ def add_new_order(request):
                     Person.objects.filter(name=str(user)).update(
                         stocks=new_stocks, fiat=new_fiat)
                     content.append({
-                        "action": "update_user",
+                        "type": "update_user",
                         "payload": {
                             "name": person.name,
                             "stocks": new_stocks,
@@ -247,7 +247,7 @@ def add_new_order(request):
                                                     price=price, owner=str(user))
                     pending_buy.save()
                     content.append({
-                        "action": "add_pending_buy",
+                        "type": "add_pending_buy",
                         "payload": {
                             "id": pending_buy.id,
                             "user": pending_buy.owner,
@@ -256,16 +256,14 @@ def add_new_order(request):
                         }
                     })
             else:
-                
-                
 
                 if stock_amount > 0:
                     pending_sell = Pending_Sell_Order(quantity=stock_amount,
-                                                    price=price, owner=str(user))
+                                                      price=price, owner=str(user))
                     pending_sell.save()
 
                     content.append({
-                        "action": "add_pending_sell",
+                        "type": "add_pending_sell",
                         "payload": {
                             "id": pending_sell.id,
                             "user": pending_sell.owner,
