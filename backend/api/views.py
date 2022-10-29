@@ -257,6 +257,124 @@ def add_new_order(request):
                     })
             else:
 
+                to_save = []
+                to_delete = []
+                user_buyed = {}
+
+                buyers = Pending_Buy_Order.objects.filter(price=price)
+
+                for buyer in buyers:
+                    if stock_amount <= 0:
+                        break
+
+                    if buyer.quantity == stock_amount:
+                        current_quantity = user_buyed.get(buyer.owner, 0)
+                        if current_quantity == 0:
+                            user_buyed[buyer.owner] = 0
+                        user_buyed[buyer.owner] += stock_amount
+                        content.append({
+                            "type": "remove_pending_buy",
+                            "payload": {
+                                "id": buyer.id,
+                            }
+                        })
+                        to_delete.append(buyer.id)
+                        stock_amount = 0
+                    elif buyer.quantity > stock_amount:
+                        current_quantity = user_buyed.get(buyer.owner, 0)
+                        if current_quantity == 0:
+                            user_buyed[buyer.owner] = 0
+                        user_buyed[buyer.owner] += stock_amount
+                        content.append({
+                            "type": "update_pending_buy",
+                            "payload": {
+                                "id": buyer.id,
+                                "quantity": buyer.quantity - stock_amount
+                            }
+                        })
+                        to_save.append(
+                            {"id": buyer.id, "quantity": buyer.quantity - stock_amount})
+                        stock_amount = 0
+                    else:
+                        current_quantity = user_buyed.get(buyer.owner, 0)
+                        if current_quantity == 0:
+                            user_buyed[buyer.owner] = 0
+                        user_buyed[buyer.owner] += buyer.quantity
+                        content.append({
+                            "type": "remove_pending_buy",
+                            "payload": {
+                                "id": buyer.id,
+                            }
+                        })
+                        to_delete.append(buyer.id)
+                        stock_amount -= buyer.quantity
+                
+                seller_quantity = 0
+                seller_price = 0
+                once = 1
+                for key in user_buyed:
+                    trans = Transaction(seller=str(user), buyer=key, quantity=user_buyed[key], price=price)
+                    trans.save()
+                    content.append({
+                        "type": "add_transaction",
+                        "payload": {
+                            "id": trans.id,
+                            "seller": trans.seller,
+                            "buyer": trans.buyer,
+                            "quantity": trans.quantity,
+                            "price": trans.price,
+                            "date": trans.date
+                        }
+                    })
+                    if once == 1:
+                        MarketPrice(price=trans.price).save()
+                        content.append({
+                            "type": "change_market_price",
+                            "payload": {
+                                "market_price": trans.price
+                            }
+                        })
+                        once = 0
+                    seller_quantity += trans.quantity
+                    seller_price += (trans.quantity * trans.price)
+                    person = Person.objects.filter(name=trans.buyer).first()
+                    new_stocks = person.stocks + trans.quantity
+                    new_fiat = person.fiat - (trans.quantity * trans.price)
+                    Person.objects.filter(name=trans.seller).update(
+                        stocks=new_stocks, fiat=new_fiat)
+                    content.append({
+                        "type": "update_user",
+                        "payload": {
+                            "name": trans.seller,
+                            "stocks": new_stocks,
+                            "fiat": new_fiat
+                        }
+                    })
+
+                if seller_quantity != 0:
+                    person = Person.objects.filter(name=str(user)).first()
+                    new_stocks = person.stocks - seller_quantity
+                    new_fiat = person.fiat + seller_price
+
+                    Person.objects.filter(name=str(user)).update(
+                        stocks=new_stocks, fiat=new_fiat)
+                    content.append({
+                        "type": "update_user",
+                        "payload": {
+                            "name": person.name,
+                            "stocks": new_stocks,
+                            "fiat": new_fiat
+                        }
+                    })
+
+                for key in to_delete:
+                    Pending_Sell_Order.objects.filter(id=key).delete()
+
+                for key in to_save:
+                    Pending_Sell_Order.objects.filter(
+                        id=key['id']).update(quantity=key['quantity'])
+
+
                 if stock_amount > 0:
                     pending_sell = Pending_Sell_Order(quantity=stock_amount,
                                                       price=price, owner=str(user))
