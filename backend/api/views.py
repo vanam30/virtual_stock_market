@@ -340,12 +340,12 @@ def add_new_order(request):
                     person = Person.objects.filter(name=trans.buyer).first()
                     new_stocks = person.stocks + trans.quantity
                     new_fiat = person.fiat - (trans.quantity * trans.price)
-                    Person.objects.filter(name=trans.seller).update(
+                    Person.objects.filter(name=trans.buyer).update(
                         stocks=new_stocks, fiat=new_fiat)
                     content.append({
                         "type": "update_user",
                         "payload": {
-                            "name": trans.seller,
+                            "name": trans.buyer,
                             "stocks": new_stocks,
                             "fiat": new_fiat
                         }
@@ -368,10 +368,10 @@ def add_new_order(request):
                     })
 
                 for key in to_delete:
-                    Pending_Sell_Order.objects.filter(id=key).delete()
+                    Pending_Buy_Order.objects.filter(id=key).delete()
 
                 for key in to_save:
-                    Pending_Sell_Order.objects.filter(
+                    Pending_Buy_Order.objects.filter(
                         id=key['id']).update(quantity=key['quantity'])
 
 
