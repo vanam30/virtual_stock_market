@@ -196,6 +196,12 @@ def add_new_order(request):
                     })
                     if once == 1:
                         MarketPrice(price=trans.price).save()
+                        content.append({
+                            "action": "change_market_price",
+                            "desc": {
+                                "market_price" : trans.price
+                            }
+                        })
                         once = 0
                     buyer_quantity += trans.quantity
                     buyer_price += (trans.quantity * trans.price)
@@ -213,20 +219,21 @@ def add_new_order(request):
                         }
                     })
 
-                person = Person.objects.filter(name=str(user)).first()
-                new_stocks = person.stocks + buyer_quantity
-                new_fiat = person.fiat - buyer_price
+                if buyer_quantity != 0:
+                    person = Person.objects.filter(name=str(user)).first()
+                    new_stocks = person.stocks + buyer_quantity
+                    new_fiat = person.fiat - buyer_price
 
-                Person.objects.filter(name=str(user)).update(
-                    stocks=new_stocks, fiat=new_fiat)
-                content.append({
-                    "action": "update_user",
-                    "desc": {
-                        "name": person.name,
-                        "stocks": new_stocks,
-                        "fiat": new_fiat
-                    }
-                })
+                    Person.objects.filter(name=str(user)).update(
+                        stocks=new_stocks, fiat=new_fiat)
+                    content.append({
+                        "action": "update_user",
+                        "desc": {
+                            "name": person.name,
+                            "stocks": new_stocks,
+                            "fiat": new_fiat
+                        }
+                    })
 
                 for key in to_delete:
                     Pending_Sell_Order.objects.filter(id=key).delete()
@@ -249,19 +256,23 @@ def add_new_order(request):
                         }
                     })
             else:
-                pending_sell = Pending_Sell_Order(quantity=stock_amount,
-                                                  price=price, owner=str(user))
-                pending_sell.save()
+                
+                
 
-                content.append({
-                    "action": "add_pending_sell",
-                    "desc": {
-                        "id": pending_sell.id,
-                        "user": pending_sell.owner,
-                        "quantity": pending_sell.quantity,
-                        "price": pending_sell.price
-                    }
-                })
+                if stock_amount > 0:
+                    pending_sell = Pending_Sell_Order(quantity=stock_amount,
+                                                    price=price, owner=str(user))
+                    pending_sell.save()
+
+                    content.append({
+                        "action": "add_pending_sell",
+                        "desc": {
+                            "id": pending_sell.id,
+                            "user": pending_sell.owner,
+                            "quantity": pending_sell.quantity,
+                            "price": pending_sell.price
+                        }
+                    })
 
             return Response(content)
         else:
@@ -278,13 +289,14 @@ def add_new_order(request):
 def get_market_price(request):
     if len(MarketPrice.objects.all()) == 0:
         MarketPrice(price=0).save()
-    market_price = MarketPrice.objects.all().first()
-    serializer = MarketPriceSerializer(market_price,many=False)
+    market_price = MarketPrice.objects.all().last()
+    serializer = MarketPriceSerializer(market_price, many=False)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def get_graph(request):
     if len(MarketPrice.objects.all()) == 0:
         MarketPrice(price=0).save()
-    serializer = MarketPriceSerializer(MarketPrice.objects.all(),many=True)
+    serializer = MarketPriceSerializer(MarketPrice.objects.all(), many=True)
     return Response(serializer.data)
