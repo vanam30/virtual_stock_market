@@ -95,47 +95,74 @@ def add_new_order(request):
         price = request.data.get('price', None)
 
         if buy_or_sell == None:
-            return Response({'error': 'buy_sell info not found'})
+            return Response({'error': 'buy_sell info not found', 'error_code': 1})
         if buy_or_sell != 'buy' and buy_or_sell != 'sell':
-            return Response({'error': 'wrong choice in buy_or_sell'})
+            return Response({'error': 'wrong choice in buy_or_sell', 'error_code': 2})
 
         if user == None:
-            return Response({'error': 'user info not found'})
+            return Response({'error': 'user info not found', 'error_code': 3})
         if len(Person.objects.filter(name=user)) == 0:
-            return Response({"error": "user not found in database"})
+            return Response({"error": "user not found in database", 'error_code': 4})
         user = Person.objects.filter(name=user).first()
 
         if order_type == None:
-            return Response({"error": "order_type not found"})
+            return Response({"error": "order_type not found", 'error_code': 5})
         if order_type != "limit" and order_type != "market":
-            return Response({"error": "Wrong Choice for order_type"})
+            return Response({"error": "Wrong Choice for order_type", 'error_code': 6})
 
         if stock_amount == None:
-            return Response({"error": "stock_amount not found"})
+            return Response({"error": "stock_amount not found", 'error_code': 7})
 
         try:
             stock_amount = int(stock_amount)
         except:
-            return Response({"error": "Wrong type of stock amount"})
+            return Response({"error": "Wrong type of stock amount", 'error_code': 8})
 
         if order_type == 'limit':
             if price == None:
-                return Response({"error": "price not found"})
+                return Response({"error": "price not found", 'error_code': 9})
             try:
                 price = float(price)
             except:
-                return Response({"error": "Wrong type of price"})
+                return Response({"error": "Wrong type of price", 'error_code': 10})
 
             # TODO : Apply limit rules
-
+            content = []
             if buy_or_sell == 'buy':
-                Pending_Buy_Order(quantity=stock_amount,
-                                  price=price, owner=user).save()
-            else:
-                Pending_Sell_Order(quantity=stock_amount,
-                                   price=price, owner=user).save()
+                # TODO: Search for match in Pending Sells
 
-            return Response({"success": "ok"})
+                sellers = Pending_Sell_Order.objects.filter(price=price)
+                for seller in sellers:
+                    print(seller)
+
+                pending_buy = Pending_Buy_Order(quantity=stock_amount,
+                                                price=price, owner=str(user))
+                pending_buy.save()
+                content.append({
+                    "action": "add_pending_buy",
+                    "desc": {
+                        "id": pending_buy.id,
+                        "user": pending_buy.owner,
+                        "quantity": pending_buy.quantity,
+                        "price": pending_buy.price
+                    }
+                })
+            else:
+                pending_sell = Pending_Sell_Order(quantity=stock_amount,
+                                                  price=price, owner=str(user))
+                pending_sell.save()
+
+                content.append({
+                    "action": "add_pending_sell",
+                    "desc": {
+                        "id": pending_sell.id,
+                        "user": pending_sell.owner,
+                        "quantity": pending_sell.quantity,
+                        "price": pending_sell.price
+                    }
+                })
+
+            return Response(content)
         else:
             # TODO : Apply market rules
 

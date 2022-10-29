@@ -1,4 +1,3 @@
-from email.policy import default
 from django.db import models
 
 
@@ -15,7 +14,7 @@ class Pending_Buy_Order(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
     added = models.DateField(auto_now_add=True)
-    owner = models.ForeignKey(Person, on_delete=models.CASCADE)
+    owner = models.CharField(max_length=32)
 
     def __str__(self):
         return str(self.added)
@@ -25,8 +24,7 @@ class Pending_Sell_Order(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
     added = models.DateField(auto_now_add=True)
-    owner = models.OneToOneField(
-        Person, related_name='pending_sell_order', on_delete=models.CASCADE)
+    owner = models.CharField(max_length=32)
 
     def __str__(self):
         return str(self.added)
