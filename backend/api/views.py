@@ -1,10 +1,7 @@
 from rest_framework.response import Response
-from myUser.models import Person, Pending_Buy_Order, Pending_Sell_Order, Transaction
-from .serializers import PersonSerializers, BuyOrderSerializer, SellOrderSerializer, TransactionSerializer
+from myUser.models import Person, Pending_Buy_Order, Pending_Sell_Order, Transaction, MarketPrice
+from .serializers import PersonSerializers, BuyOrderSerializer, SellOrderSerializer, TransactionSerializer, MarketPriceSerializer
 from rest_framework.decorators import api_view
-
-MARKET_PRICE = 100
-PREVIOUS_PRICE = [MARKET_PRICE]
 
 
 @api_view(['GET'])
@@ -130,23 +127,127 @@ def add_new_order(request):
             content = []
             if buy_or_sell == 'buy':
                 # TODO: Search for match in Pending Sells
-
+                to_save = []
+                to_delete = []
+                user_selled = {}
                 sellers = Pending_Sell_Order.objects.filter(price=price)
                 for seller in sellers:
-                    print(seller)
+                    if stock_amount <= 0:
+                        break
+                    if seller.quantity == stock_amount:
+                        current_quantity = user_selled.get(seller.owner, 0)
+                        if current_quantity == 0:
+                            user_selled[seller.owner] = 0
+                        user_selled[seller.owner] += stock_amount
+                        content.append({
+                            "action": "remove_pending_sell",
+                            "desc": {
+                                "id": seller.id,
+                            }
+                        })
+                        to_delete.append(seller.id)
+                        stock_amount = 0
 
-                pending_buy = Pending_Buy_Order(quantity=stock_amount,
-                                                price=price, owner=str(user))
-                pending_buy.save()
+                    elif seller.quantity > stock_amount:
+                        current_quantity = user_selled.get(seller.owner, 0)
+                        if current_quantity == 0:
+                            user_selled[seller.owner] = 0
+                        user_selled[seller.owner] += stock_amount
+                        content.append({
+                            "action": "update_pending_sell",
+                            "desc": {
+                                "id": seller.id,
+                                "quantity": seller.quantity - stock_amount
+                            }
+                        })
+                        to_save.append(
+                            {"id": seller.id, "quantity": seller.quantity - stock_amount})
+                        stock_amount = 0
+                    else:
+                        current_quantity = user_selled.get(seller.owner, 0)
+                        if current_quantity == 0:
+                            user_selled[seller.owner] = 0
+                        user_selled[seller.owner] += seller.quantity
+                        content.append({
+                            "action": "remove_pending_sell",
+                            "desc": {
+                                "id": seller.id,
+                            }
+                        })
+                        to_delete.append(seller.id)
+                        stock_amount -= seller.quantity
+                buyer_quantity = 0
+                buyer_price = 0
+                once = 1
+                for key in user_selled:
+                    trans = Transaction(seller=key, buyer=str(
+                        user), quantity=user_selled[key], price=price)
+                    trans.save()
+                    content.append({
+                        "action": "add_transaction",
+                        "desc": {
+                            "id": trans.id,
+                            "seller": trans.seller,
+                            "buyer": trans.buyer,
+                            "quantity": trans.quantity,
+                            "price": trans.price,
+                            "date": trans.date
+                        }
+                    })
+                    if once == 1:
+                        MarketPrice(price=trans.price).save()
+                        once = 0
+                    buyer_quantity += trans.quantity
+                    buyer_price += (trans.quantity * trans.price)
+                    person = Person.objects.filter(name=trans.seller).first()
+                    new_stocks = person.stocks - trans.quantity
+                    new_fiat = person.fiat + (trans.quantity * trans.price)
+                    Person.objects.filter(name=trans.seller).update(
+                        stocks=new_stocks, fiat=new_fiat)
+                    content.append({
+                        "action": "update_user",
+                        "desc": {
+                            "name": trans.seller,
+                            "stocks": new_stocks,
+                            "fiat": new_fiat
+                        }
+                    })
+
+                person = Person.objects.filter(name=str(user)).first()
+                new_stocks = person.stocks + buyer_quantity
+                new_fiat = person.fiat - buyer_price
+
+                Person.objects.filter(name=str(user)).update(
+                    stocks=new_stocks, fiat=new_fiat)
                 content.append({
-                    "action": "add_pending_buy",
+                    "action": "update_user",
                     "desc": {
-                        "id": pending_buy.id,
-                        "user": pending_buy.owner,
-                        "quantity": pending_buy.quantity,
-                        "price": pending_buy.price
+                        "name": person.name,
+                        "stocks": new_stocks,
+                        "fiat": new_fiat
                     }
                 })
+
+                for key in to_delete:
+                    Pending_Sell_Order.objects.filter(id=key).delete()
+
+                for key in to_save:
+                    Pending_Sell_Order.objects.filter(
+                        id=key['id']).update(quantity=key['quantity'])
+
+                if stock_amount > 0:
+                    pending_buy = Pending_Buy_Order(quantity=stock_amount,
+                                                    price=price, owner=str(user))
+                    pending_buy.save()
+                    content.append({
+                        "action": "add_pending_buy",
+                        "desc": {
+                            "id": pending_buy.id,
+                            "user": pending_buy.owner,
+                            "quantity": pending_buy.quantity,
+                            "price": pending_buy.price
+                        }
+                    })
             else:
                 pending_sell = Pending_Sell_Order(quantity=stock_amount,
                                                   price=price, owner=str(user))
@@ -175,17 +276,15 @@ def add_new_order(request):
 
 @api_view(['GET'])
 def get_market_price(request):
-    global MARKET_PRICE
-    global PREVIOUS_PRICE
-
-    # -> TESTING PURPOSE
-    MARKET_PRICE += 1
-    PREVIOUS_PRICE.append(MARKET_PRICE)
-    #################################
-
-    return Response({'market_price': MARKET_PRICE})
-
+    if len(MarketPrice.objects.all()) == 0:
+        MarketPrice(price=0).save()
+    market_price = MarketPrice.objects.all().first()
+    serializer = MarketPriceSerializer(market_price,many=False)
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def get_graph(request):
-    return Response(PREVIOUS_PRICE)
+    if len(MarketPrice.objects.all()) == 0:
+        MarketPrice(price=0).save()
+    serializer = MarketPriceSerializer(MarketPrice.objects.all(),many=True)
+    return Response(serializer.data)

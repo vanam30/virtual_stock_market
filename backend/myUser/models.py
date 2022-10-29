@@ -13,7 +13,7 @@ class Person(models.Model):
 class Pending_Buy_Order(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
-    added = models.DateField(auto_now_add=True)
+    added = models.DateTimeField(auto_now_add=True)
     owner = models.CharField(max_length=32)
 
     def __str__(self):
@@ -23,7 +23,7 @@ class Pending_Buy_Order(models.Model):
 class Pending_Sell_Order(models.Model):
     quantity = models.IntegerField()
     price = models.FloatField()
-    added = models.DateField(auto_now_add=True)
+    added = models.DateTimeField(auto_now_add=True)
     owner = models.CharField(max_length=32)
 
     def __str__(self):
@@ -31,12 +31,19 @@ class Pending_Sell_Order(models.Model):
 
 
 class Transaction(models.Model):
-    seller = models.ForeignKey(
-        Person, on_delete=models.CASCADE, related_name='trans_seller')
-    buyer = models.ForeignKey(Person, on_delete=models.CASCADE)
+    seller = models.CharField(max_length=32)
+    buyer = models.CharField(max_length=32)
     quantity = models.IntegerField()
     price = models.FloatField()
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return str(self.date) + " (" + str(self.seller)+" -> "+str(self.buyer)+")"
+
+
+class MarketPrice(models.Model):
+    date = models.DateTimeField(auto_now_add=True)
+    price = models.FloatField()
+
+    def __str__(self) -> str:
+        return str(self.price) + "->" + str(self.date)

@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from myUser.models import Person,Pending_Sell_Order,Pending_Buy_Order,Transaction
+from myUser.models import MarketPrice,Person,Pending_Sell_Order,Pending_Buy_Order,Transaction
 
 class PersonSerializers(ModelSerializer):
     class Meta:
@@ -19,4 +19,9 @@ class SellOrderSerializer(ModelSerializer):
 class TransactionSerializer(ModelSerializer):
     class Meta:
         model = Transaction
+        fields = '__all__'
+
+class MarketPriceSerializer(ModelSerializer):
+    class Meta:
+        model = MarketPrice
         fields = '__all__'
