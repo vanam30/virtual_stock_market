@@ -1,47 +1,24 @@
-import "./App.css";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-const USER_URL = "http://127.0.0.1:8000/user";
+import Graph from "./components/Graph";
+import Portfolio from "./components/Portfolio";
+import Tform from "./components/Tform";
+import OrderBook from "./components/OrderBook";
+import Navbar from "./components/Navbar";
 
-const App = () => {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    axios
-      .get(USER_URL)
-      .then((res) => {
-        console.log(res.data);
-        setUsers(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+function App() {
   return (
-    <div className="App">
-      <table className="table">
-        <thead>
-          <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Stock</th>
-            <th scope="col">Fiat</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => {
-            return (
-              <tr key={user.id}>
-                <td>{user.name}</td>
-                <td>{user.stocks}</td>
-                <td>{user.fiat}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+    <div className="container">
+      <Navbar />
+      <div className="row">
+        <div className="col-8"><Graph /></div>
+        <div className="col-4"><Tform /></div>
+      </div>
+      <div className="row">
+        <div className="col-4"><Portfolio /></div>
+        <div className="col-8"><OrderBook /></div>
+      </div>
     </div>
   );
-};
+}
 
 export default App;
