@@ -1,11 +1,7 @@
-
-let lastid = 0;
-
 let newstate={};
 
 function reducer(state={users:[],actions: [],buyPending: [], sellPending:[], transaction: [], marketPrices: []}, action) {
 newstate.actions = [...state.actions, action];
-console.log({action});
   switch (action.type) {
     case "change_market_price":
         newstate.users = [...state.users];

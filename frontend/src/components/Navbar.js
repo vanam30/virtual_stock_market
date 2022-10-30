@@ -1,14 +1,25 @@
 // import DensityLogo from '../images/density.jpeg';
 import Actions from "./Actions";
+import store from "../store";
+
+import { useState } from "react";
 
 export default function Navbar() {
+    const [prices,update_prices] = useState(store.getState().marketPrices);
+
+    store.subscribe(()=>{
+        update_prices(store.getState().marketPrices);
+    });
     return (
         <div>
             <nav className="navbar navbar-dark bg-dark">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
-                    {/* <img src={DensityLogo} /> */}
-                    </a>
+                    <div className="navbar-brand" href="#">
+                    Current Market Price:&nbsp;
+                    {
+                        prices.length > 0 ? prices[prices.length-1].price:"NA"
+                    }
+                    </div>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         Notifications
                     </button>

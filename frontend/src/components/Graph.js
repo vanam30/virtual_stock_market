@@ -12,7 +12,7 @@ function Graph(){
       labels: store.getState().marketPrices.map((item,idx) => item.date),
       datasets: [
         {
-          label: "Plot",
+          label: "Market Price vs Time",
           backgroundColor: "rgb(255, 99, 132)",
           borderColor: "rgb(255, 99, 132)",
           data: store.getState().marketPrices.map((item,idx) => item.price),
@@ -20,29 +20,12 @@ function Graph(){
       ],
     });
     
-    // const [plot_data, update_data] = useState([
-    //     {
-    //         x: store.getState().marketPrices.map((u_data,idx) =>  idx),
-    //         y: store.getState().marketPrices.map((u_data) => u_data.price),
-    //         type: 'scatter',
-    //         mode: 'lines+markers',
-    //         marker: {color: 'red'},
-    //     },
-    // ]);
     store.subscribe(()=>{
-        console.log("Graph.js: store.subscribe() called", store.getState().marketPrices);
-        // update_data([{
-        //     x: store.getState().marketPrices.map((u_data,idx) => idx),
-        //     y: store.getState().marketPrices.map((u_data) => u_data.price),
-        //     type: 'scatter',
-        //     mode: 'lines+markers',
-        //     marker: {color: 'red'},
-        // }]);
         setData({
             labels:store.getState().marketPrices.map((item,idx) => item.date),
             datasets: [
               {
-                label: "Plot",
+                label: "Market Price vs Time",
                 backgroundColor: "rgb(255, 99, 132)",
                 borderColor: "rgb(255, 99, 132)",
                 data: store.getState().marketPrices.map((item,idx) => item.price),

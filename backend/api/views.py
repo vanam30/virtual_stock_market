@@ -634,15 +634,16 @@ def add_new_order(request):
                         }
                     })
                     last_transaction = pending_sell.price
+        mp = MarketPrice(price=last_transaction)
+        mp.save()
         content.append(
             {
                 "type": "change_market_price",
                 "payload": {
-                    "market_price": last_transaction
+                    "market_price": MarketPriceSerializer(mp,many=False).data
                 }
             }
         )
-        MarketPrice(price=last_transaction).save()
         return Response(content)
 
 

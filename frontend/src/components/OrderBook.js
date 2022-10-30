@@ -12,7 +12,6 @@ function OrderBook(){
 
         let buy_arr = store.getState().buyPending;
         buy_arr = buy_arr.sort((a,b)=>{return a.price-b.price;});
-        console.log(buy_arr);
         let price = -1;
         let id = 1;
         let temp = [];
