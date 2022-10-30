@@ -30,7 +30,7 @@ function App() {
       <div className="row">
         <div className="col-3 card">
           <div className="card-body">
-            <h5 class="card-title">Users</h5>
+            <h5 class="card-title">User Portfolio</h5>
             <Portfolio />
           </div>
         </div>
@@ -42,7 +42,7 @@ function App() {
         </div>
       </div>
       <div className="col-8 card">
-          <div className="card-body">
+          <div className="card-body" style={{ height: "400px", overflow: "scroll" }}>
             <h5 class="card-title">Transaction History</h5>
             <Transaction />
           </div>
