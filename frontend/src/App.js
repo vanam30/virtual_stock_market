@@ -1,4 +1,3 @@
-
 import Graph from "./components/Graph";
 import Portfolio from "./components/Portfolio";
 import Tform from "./components/Tform";
@@ -7,12 +6,24 @@ import Navbar from "./components/Navbar";
 import Transaction from "./components/Transaction";
 import Actions from "./components/Actions";
 import store from "./store";
-import "./App.css"
+import React, { useState } from "react";
+import "./App.css";
 
 function App() {
+  const [mode, setMode] = useState("light");
+
+  const togglemode = () => {
+    if (mode === "light") {
+      setMode("dark");
+      document.body.style.backgroundColor = "#1f2330";
+    } else {
+      setMode("light");
+      document.body.style.backgroundColor = " #4d648d";
+    }
+  };
   return (
     <>
-      <Navbar />
+      <Navbar mode={mode} togglemode={togglemode} />
       <div className="row">
         <div className="col-7 card">
           <div className="card-body">
@@ -30,7 +41,7 @@ function App() {
       <div className="row">
         <div className="col-3 card">
           <div className="card-body">
-            <h5 class="card-title">User Portfolio</h5>
+            <h5 class="card-title">Users</h5>
             <Portfolio />
           </div>
         </div>
@@ -42,11 +53,11 @@ function App() {
         </div>
       </div>
       <div className="col-8 card">
-          <div className="card-body" style={{ height: "400px", overflow: "scroll" }}>
-            <h5 class="card-title">Transaction History</h5>
-            <Transaction />
-          </div>
+        <div className="card-body">
+          <h5 class="card-title">Transaction History</h5>
+          <Transaction />
         </div>
+      </div>
     </>
   );
 }
