@@ -52,7 +52,7 @@ function App() {
           </div>
         </div>
       </div>
-      <div className="col-8 card">
+      <div className="container card" style={{ height: "400px", overflow: "scroll" }}>
         <div className="card-body">
           <h5 class="card-title">Transaction History</h5>
           <Transaction />
