@@ -19,7 +19,7 @@ function Transaction(){
                 <th scope="col">Price</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody style={{ overflow: "scroll !important", height: "40px !important" }}>
                 {
                     transactions.map((transact) => {
                         return <tr key={transact.id}><td>{transact.seller}</td><td>{transact.buyer}</td><td>{transact.quantity}</td><td>{transact.price}</td></tr>

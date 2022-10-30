@@ -101,10 +101,10 @@ function Tform(){
                     <input type="number" name="stock_amount" id="stock_amount" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
                 </div>
                 <div class="input-group mb-3">
-                    <span class="input-group-text" id="inputGroup-sizing-default">Price</span>
+                    
                     {
-                        type == "limit" ? <input type="number" name="stock_amount" id="stock_amount" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" />
-                        : <input type="number" name="price" id="price" value={price} disabled />
+                        type == "limit" ?<><span class="input-group-text" id="inputGroup-sizing-default">Price</span><input type="number" name="stock_amount" id="stock_amount" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default" /></>
+                        : <input type="number" name="price" id="price" value={price} hidden />
                     }
                 </div>
                 <button class="btn btn-primary" type="submit">Place Order</button>
