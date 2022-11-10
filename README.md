@@ -1,4 +1,4 @@
-# Desnity_Hackathon
+# Density_Hackathon
 ## Contributors
 - Grace Sharma
 - Umang Singla
