@@ -1,10 +1,4 @@
 # Density_Hackathon
-## Contributors
-- Grace Sharma
-- Umang Singla
-- Manav Sharma
-- Harsh Jha
-- Saurabh Sameer
 ## About
 Problem Statement: Designing stock market auction mechanism.
 
